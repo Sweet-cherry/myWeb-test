@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>饼图</title>
+<style>
+	canvas{
+		border: 1px solid #000;
+	}
+	</style>
+</head>
+<body>
+	<canvas id="cas" width="600px" height="600px"></canvas> 
+</body>
+<script>
+	//角度转换为弧度的封装方法
+	function toRadian(angle){
+		return angle*Math.PI/180;
+	}
+	var cas = document.getElementById('cas');
+	var ctx = cas.getContext('2d');
+	var r = 150;//饼图半径
+	var x = cas.width/2;
+	var y = cas.height/2;
+	var datas = [13,8,25,18,27,5]; //饼图中的数据
+	var sum = 0;
+	datas.forEach(function(v){
+		sum += v; //求和
+	});
+	//将数据转换为饼图中对应的角度，所占比率为：angle/360 = datas[i]/sum
+	dataAngles = datas.map(function(v){ //用数组的映射方法，返回一个各个数据对应角度的新数组
+		return v/sum*360;
+	});
+	var colors = "deeppink,yellowgreen,skyblue,orange,purple,gray".split(',');//每块饼的颜色数组
+	var txts = "null,小学生,初中生,高中生,大学生,研究硕士".split(',');//饼图文字描述数组
+	var start = -90;//起始角度
+	var distance = 25;//中间线延长出圆的距离
+	var paddingX = 10;//文字距离线的左右padding间距值，和CSS一样的含义，所以单独一边padding为10/2
+	var paddingY = 10;//文字距离线的上下padding间距值
+	dataAngles.forEach(function(v,i){
+		//根据所占角度，画出每块楔形
+		ctx.beginPath();
+		ctx.moveTo(x,y);
+		ctx.arc(x,y,r,toRadian(start),toRadian(start+v));
+		ctx.fillStyle = colors[i];
+		ctx.fill();
+		ctx.closePath();
+		//画延长线
+		ctx.beginPath();
+		ctx.moveTo(x,y);//从圆心开始，每条线颜色与饼块相同，所以只能看到延伸出的一部分
+		//算出每块楔形曲线中心线（长超出半径distance长度）终点x0,y0坐标
+		var x0 = x + (r+distance)*Math.cos(toRadian(start + v/2));
+		var y0 = y + (r+distance)*Math.sin(toRadian(start + v/2));
+		ctx.lineTo(x0,y0);
+		ctx.strokeStyle = colors[i];
+		ctx.stroke();
+		ctx.font = "16px 黑体";
+		//当楔形角度大于90度并小于270的时候，即饼图左半边（水平向右为0度坐标线），延长线需要从右画向左，文字的对齐方式向左，即对齐点为右下角right
+		if (start + v/2 >90 &&start + v/2 <270) {
+			ctx.textAlign = 'right';
+			//同时设置padding值，饼图左边，起始点x坐标要向左负方向偏padding值，所以是减号
+			ctx.fillText(txts[i],x0 - paddingX/2,y0 - paddingY/2);
+		}else{
+			//饼图右边，起始点x坐标要向右正方向偏padding值，所以是加号
+			ctx.fillText(txts[i],x0 + paddingX/2,y0 - paddingY/2);
+		}
+		ctx.beginPath();
+		ctx.moveTo(x0,y0);
+		if (start + v/2 >90 &&start + v/2 <270) {
+			//设置水平延长线的长度，注意需要在fillText以后才能取到文本宽度对象，并取width值
+			//水平延长线长度为文本长度加上padding水平间距值
+			//饼图左边需要为负值，这样设置直线到的位置时，可以是减号，像左边负方向延伸
+			len = -(ctx.measureText(txts[i]).width + paddingX);
+		}else{
+			len = ctx.measureText(txts[i]).width + paddingX;
+		}
+		ctx.lineTo(x0 + len,y0);
+		ctx.stroke();
+		start = start + v;
+	});
+
+
+</script>
+</html>

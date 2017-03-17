@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>构造函数</title>
+<style>
+	canvas{
+		border: 1px solid #000;
+	}
+	</style>
+</head>
+<body>
+	<canvas id="cas" width="600px" height="600px"></canvas> 
+</body>
+<script>
+	var cas = document.getElementById('cas');
+	var ctx = cas.getContext('2d');
+	//封装矩形的构造函数
+	function Rect(config){
+		this.ctx = config.ctx;
+		this.x = config.x;
+		this.y = config.y;
+		this.width = config.width;
+		this.height = config.height;
+		this.fillStyle = config.fillStyle || 'black'; //在传参时加入默认值，没有传参，则是black
+		this.strokeStyle = config.strokeStyle || 'black';
+		this.lineWidth = config.lineWidth || 1;
+	}
+	Rect.prototype = {
+		constructor:Rect,
+		stroke: function(){
+			this.ctx.save(); //封装函数时状态保持，使每次构造函数时，不会影响画布状态
+			this.ctx.beginPath();
+			this.ctx.strokeStyle = this.strokeStyle;
+			this.ctx.lineWidth = this.lineWidth;
+			this.ctx.strokeRect(this.x,this.y,this.width,this.height);
+			this.ctx.closePath();
+			this.ctx.restore();
+		},
+		fill: function(){
+			this.ctx.save(); 
+			this.ctx.beginPath();
+			this.ctx.fillStyle = this.fillStyle;
+			this.ctx.fillRect(this.x,this.y,this.width,this.height);
+			this.ctx.closePath();
+			this.ctx.restore();
+		}
+	}
+
+	/*var a = new Rect({
+		ctx:ctx,
+		x:100,
+		y:100,
+		width:200,
+		height:100
+	});
+	a.stroke();*/
+
+	//封装圆弧构造函数
+	function Arc(config){
+		this.ctx = config.ctx;
+		this.x = config.x;
+		this.y = config.y;
+		this.r = config.r;
+		this.startAngle = config.startAngle;
+		this.endAngle = config.endAngle;
+		this.clockwise = config.clockwise||false;
+		this.fillStyle = config.fillStyle || 'black'; //在传参时加入默认值，没有传参，则是black
+		this.strokeStyle = config.strokeStyle || 'black';
+		this.lineWidth = config.lineWidth || 1;
+	}
+	Arc.prototype = {
+		constructor:Arc,
+		stroke: function(){
+			this.ctx.save(); //封装函数时状态保持，使每次构造函数时，不会影响画布状态
+			this.ctx.beginPath();
+			this.ctx.strokeStyle = this.strokeStyle;
+			this.ctx.lineWidth = this.lineWidth;
+			this.ctx.arc(this.x,this.y,this.r,this.toRadian(this.startAngle),this.toRadian(this.endAngle),this.clockwise);
+			this.ctx.stroke();
+			this.ctx.restore();
+		},
+		fill: function(){
+			this.ctx.save(); 
+			this.ctx.beginPath();
+			this.ctx.fillStyle = this.fillStyle;
+			this.ctx.arc(this.x,this.y,this.r,this.toRadian(this.startAngle),this.toRadian(this.endAngle),this.clockwise);
+			this.ctx.fill();
+			this.ctx.closePath();
+			this.ctx.restore();
+		},
+		toRadian: function(angle){
+			return angle*Math.PI/180;
+		}
+	}
+
+	/*var arc = new Arc({
+		ctx:ctx,
+		x:100,
+		y:100,
+		r:50,
+		startAngle:-90,
+		endAngle:30
+	});
+	arc.stroke();
+	arc.fill();*/
+
+	//封装楔形构造函数
+	function Wedge(config){
+		this.ctx = config.ctx;
+		this.x = config.x;
+		this.y = config.y;
+		this.r = config.r;
+		this.startAngle = config.startAngle;
+		this.endAngle = config.endAngle;
+		this.clockwise = config.clockwise||false;
+		this.fillStyle = config.fillStyle || 'black'; //在传参时加入默认值，没有传参，则是black
+		this.strokeStyle = config.strokeStyle || 'black';
+		this.lineWidth = config.lineWidth || 1;
+	}
+	Wedge.prototype = {
+		constructor:Wedge,
+		stroke: function(){
+			this.ctx.save(); //封装函数时状态保持，使每次构造函数时，不会影响画布状态
+			this.ctx.beginPath();
+			this.ctx.moveTo(this.x,this.y);
+			this.ctx.strokeStyle = this.strokeStyle;
+			this.ctx.lineWidth = this.lineWidth;
+			this.ctx.arc(this.x,this.y,this.r,this.toRadian(this.startAngle),this.toRadian(this.endAngle),this.clockwise);
+			this.ctx.closePath();
+			this.ctx.stroke();
+			this.ctx.restore();
+		},
+		fill: function(){
+			this.ctx.save(); 
+			this.ctx.beginPath();
+			this.ctx.moveTo(this.x,this.y);
+			this.ctx.fillStyle = this.fillStyle;
+			this.ctx.arc(this.x,this.y,this.r,this.toRadian(this.startAngle),this.toRadian(this.endAngle),this.clockwise);
+			this.ctx.closePath();
+			this.ctx.fill();
+			this.ctx.restore();
+		},
+		toRadian: function(angle){
+			return angle*Math.PI/180;
+		}
+	}
+
+	var wedge = new Wedge({
+		ctx:ctx,
+		x:100,
+		y:100,
+		r:50,
+		startAngle:-90,
+		endAngle:30,
+		clockwise:true
+	});
+	wedge.stroke();
+</script>
+</html>
